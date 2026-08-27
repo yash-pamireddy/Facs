@@ -126,7 +126,7 @@ def authenticate_or_register():
 
         print("\n[NEW FACE DETECTED] No matching profile found in Pulse database.")
         cap.release()
-          cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
 
         new_name = input("Enter your name to register your FACS ID: ").strip()
         if new_name:

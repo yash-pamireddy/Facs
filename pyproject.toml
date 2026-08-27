@@ -17,4 +17,4 @@ dependencies = [
 ]
 
 [project.scripts]
-facs = "facs.auth:authenticate_or_register"
+run = "facs.auth:cli_entry"
