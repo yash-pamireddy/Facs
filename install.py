@@ -39,10 +39,15 @@ def install_dependencies():
 
   show_loading_bar("Initializing Pulse installer", 1.0)
 
-  # Upgrade pip
-  subprocess.check_call(
-      [sys.executable, "-m", "pip", "install", "--upgrade", "pip"]
-  )
+  # Only upgrade pip on standard PCs, skip on Termux to prevent errors
+  if not is_termux():
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "--upgrade", "pip"]
+    )
+  else:
+    print(
+        "\n[MOBILE DETECTED] Skipping pip self-upgrade (managed by Termux pkg)."
+    )
 
   if is_termux():
     print(
@@ -85,7 +90,7 @@ def install_dependencies():
   print("\n==========================================")
   print("   [SUCCESS] FACS is fully installed!     ")
   print("   To launch, simply type:                ")
-  print("   >>> run facs                           ")
+  print("   >>> facs                               ")
   print("==========================================")
 
 
