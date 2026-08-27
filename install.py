@@ -1,96 +1,94 @@
 """FACS — Automated Ecosystem Installer
 
 Powered by Pulse
-Automatically detects device architecture and sets up with a live progress bar.
 """
 
 import os
-import platform
 import subprocess
 import sys
+import threading
 import time
 
 
-def show_loading_bar(task_name, duration=1.5):
-  """Displays a sleek terminal progress bar for setup tasks."""
-  print(f"\n[SETUP] {task_name}...")
-  total = 30
-  for i in range(total + 1):
-    percent = int((i / total) * 100)
-    bar = "█" * i + "-" * (total - i)
-    sys.stdout.write(f"\r[{bar}] {percent}%")
-    sys.stdout.flush()
-    time.sleep(duration / total)
-  print()
-
-
 def is_termux():
-  """Detects if the script is running inside an Android Termux environment."""
+  """Detects if running inside an Android Termux environment."""
   return "TERMUX_VERSION" in os.environ or os.path.exists(
       "/data/data/com.termux"
   )
 
 
+def run_silent(cmd):
+  """Runs system commands completely hidden from terminal output."""
+  try:
+    subprocess.check_call(
+        cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+    return True
+  except subprocess.CalledProcessError:
+    return False
+
+
 def install_dependencies():
   print("==========================================")
   print("   FACS — Pulse Environment Setup         ")
-  print("   Powered by Pulse Ecosystem             ")
   print("==========================================")
 
-  show_loading_bar("Initializing Pulse installer", 1.0)
-
-  # Only upgrade pip on standard PCs, skip on Termux to prevent errors
-  if not is_termux():
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "--upgrade", "pip"]
-    )
-  else:
-    print(
-        "\n[MOBILE DETECTED] Skipping pip self-upgrade (managed by Termux pkg)."
-    )
-
+  print("\n[SETUP] Initializing secure environment...")
   if is_termux():
-    print(
-        "\n[MOBILE DETECTED] Configuring mobile-friendly Termux packages..."
-    )
-    show_loading_bar("Installing system build tools", 2.0)
-    subprocess.check_call(
-        [
-            "pkg",
-            "install",
-            "-y",
-            "cmake",
-            "clang",
-            "make",
-            "libopenblas",
-            "libjpeg-turbo",
-            "libpng",
-        ]
-    )
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "numpy", "opencv-python"]
-    )
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "dlib"])
+    run_silent([
+        "pkg",
+        "install",
+        "-y",
+        "cmake",
+        "clang",
+        "make",
+        "libopenblas",
+        "libjpeg-turbo",
+        "libpng",
+    ])
+    run_silent([sys.executable, "-m", "pip", "install", "-q", "dlib"])
   else:
-    print(
-        "\n[STANDARD PC DETECTED] Configuring desktop biometric"
-        " dependencies..."
-    )
-    show_loading_bar("Configuring environment settings", 1.0)
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "setuptools<=81"]
-    )
+    run_silent([sys.executable, "-m", "pip", "install", "-q", "setuptools<=81"])
 
-  show_loading_bar("Downloading core face recognition models", 2.5)
-  subprocess.check_call(
-      [sys.executable, "-m", "pip", "install", "face-recognition"]
+  # Define core installation packages silently
+  pip_cmd = [
+      sys.executable,
+      "-m",
+      "pip",
+      "install",
+      "-q",
+      "numpy",
+      "opencv-python",
+      "face-recognition",
+      ".",
+  ]
+
+  print("\n[INSTALLING] Downloading and configuring ecosystem...")
+
+  # Run installation in a background thread while animating the bar
+  install_thread = threading.Thread(
+      target=lambda: run_silent(pip_cmd)
   )
-  subprocess.check_call([sys.executable, "-m", "pip", "install", "."])
+  install_thread.start()
 
-  print("\n==========================================")
+  total = 35
+  i = 0
+  while install_thread.is_alive():
+    progress = i % total
+    bar = "█" * progress + "-" * (total - progress)
+    sys.stdout.write(f"\r[{bar}] Please wait...")
+    sys.stdout.flush()
+    time.sleep(0.1)
+    i += 1
+
+  install_thread.join()
+
+  # Clear progress bar line and print success box
+  sys.stdout.write("\r" + " " * 50 + "\r")
+  print("==========================================")
   print("   [SUCCESS] FACS is fully installed!     ")
   print("   To launch, simply type:                ")
-  print("   >>> facs                               ")
+  print("   >>> run facs                           ")
   print("==========================================")
 
 
