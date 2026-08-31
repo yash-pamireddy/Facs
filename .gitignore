@@ -1,13 +1,2 @@
-# Python cache and build artifacts
-__pycache__/
-*.py[cod]
-*$py.class
-build/
-dist/
-*.egg-info/
-
-# Local FACS biometric database
-users_db.pkl
-
-# VS Code workspace settings
-.vscode/
+.vercel
+.env*

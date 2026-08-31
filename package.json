@@ -1,0 +1,32 @@
+{
+  "name": "facs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yash-pamireddy/Facs.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yash-pamireddy/Facs/issues"
+  },
+  "homepage": "https://github.com/yash-pamireddy/Facs#readme",
+  "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/face_mesh": "^0.4.1633559619",
+    "@supabase/supabase-js": "^2.112.4",
+    "@vladmandic/face-api": "^1.7.15",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "three": "^0.185.1"
+  }
+}
